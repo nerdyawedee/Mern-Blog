@@ -3,7 +3,7 @@ import Home from "./Component/Home"
 import 'flowbite/dist/flowbite.css';
 import About from "./Component/About"
 import Signin from "./Component/Signin"
-import Signup from "./Component/Signup"
+import Signup from "./Pages/Signup.jsx"
 import Dashboard from "./Component/Dashboard"
 import Projects from "./Component/Projects"
 import Header from "./Pages/Header.jsx"
