@@ -1,38 +1,41 @@
 import { Alert, Button, Label, Spinner, TextInput } from 'flowbite-react'
 import React, { useState } from 'react'
-import { Link,useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { signInStart, signInFailure, signInSuccess } from '../redux/user/userSlice';
 import OAuth from '../Component/OAuth';
-function Signup() {
+function Signin() {
     const [formData, setFormData] = useState({});
-    const [errorMessage, setErrorMessage] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const navigate =useNavigate();
+    const { loading, error: errorMessage } = useSelector(state => state.user);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
     }
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!formData.username || !formData.email || !formData.password) {
-            return setErrorMessage("Please fill out all fields.")
+        if ( !formData.email || !formData.password) {
+            return dispatch(signInFailure("Please fill out all fields."));
         }
         try {
-            setLoading(true);
-            setErrorMessage(null);
-            const res = await fetch('/api/auth/signup', {
+            dispatch(signInStart());
+            const res = await fetch('/api/auth/signin', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
             });
             const data = await res.json();
             if (data.success === false) {
-                return setErrorMessage(data.message);
+                dispatch(signInFailure(data.message));
             }
-            setLoading(false);
-            if(res.ok){
-                navigate('/sign-in');
+
+            if (res.ok) {
+                localStorage.setItem('access_token', data.token);
+                dispatch(signInSuccess(data));
+                navigate('/');
             }
         } catch (error) {
-            setErrorMessage(error.message);
+            dispatch(signInFailure(error.message));
         }
     }
     return (
@@ -49,23 +52,19 @@ function Signup() {
                         </span>
                         Blog
                     </Link>
-                    <p className='text-sm mt-5'>This is a demo project .You ca sign up with your email
+                    <p className='text-sm mt-5'>This is a demo project .You ca sign in with your email
                         and password or with Google.</p>
                 </div>
                 {/* right side */}
                 <div className='flex-1'>
                     <form className='flex flex-col gap-4' onSubmit={handleSubmit}>
                         <div>
-                            <Label value="Your username" />
-                            <TextInput type='text' placeholder='Username..' id='username' onChange={handleChange} />
-                        </div>
-                        <div>
                             <Label value="Your email" />
                             <TextInput type='email' placeholder='abc12@gmail.com' id='email' onChange={handleChange} />
                         </div>
                         <div>
                             <Label value="Your password" />
-                            <TextInput type='password' placeholder='Password...' id='password' onChange={handleChange} />
+                            <TextInput type='password' placeholder='***************' id='password' onChange={handleChange} />
                         </div>
                         <Button gradientDuoTone="purpleToPink" type='submit' disabled={loading}> {
                             loading ? (
@@ -73,14 +72,14 @@ function Signup() {
                                     <Spinner size="sm" />
                                     <span className='pl-3'>Loading...</span>
                                 </>
-                            ) : 'Sign Up'
+                            ) : 'Sign In'
                         }</Button>
-                        <OAuth/>
+                        <OAuth />
                     </form>
                     <div className='flex gap-2 text-sm mt-5'>
-                        <span>Have an account?</span>
-                        <Link to='/sign-in' className='text-blue-500' >
-                            Sign In
+                        <span>Dont Have an account?</span>
+                        <Link to='/sign-up' className='text-blue-500' >
+                            Sign Up
                         </Link>
                     </div>
                     {
@@ -96,4 +95,4 @@ function Signup() {
     )
 }
 
-export default Signup
+export default Signin
