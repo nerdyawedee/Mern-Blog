@@ -17,7 +17,10 @@ export default function CommentSection({ postId }) {
   useEffect(() => {
     const getComments = async () => {
       try {
-        const res = await fetch(`/api/comment/getPostComments/${postId}`);
+        // const token = localStorage.getItem("access_token");
+        // console.log(token);
+        const res = await fetch(`http://localhost:3000/api/comment/getPostComments/${postId}`
+        );
         if (res.ok) {
           const data = await res.json();
           setComments(data);
@@ -31,18 +34,23 @@ export default function CommentSection({ postId }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
+    if (!currentUser || !currentUser.token) {
+      console.error("No valid token found");
+      // navigate('/sign-in');
+      return;
+    }
+  
     if (comment.length > 200) {
       setCommentError('Comment exceeds the maximum length of 200 characters');
       return;
     }
+  
     try {
-      console.log('Current User:', currentUser);
-      console.log('Token:', currentUser.token);
-
-      const res = await fetch('/api/comment/create', {
+      const res = await fetch(`http://localhost:3000/api/comment/create`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${currentUser.token}`,
+          'Authorization': `Bearer ${currentUser.token}`,  // Include token in the header
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -51,29 +59,34 @@ export default function CommentSection({ postId }) {
           userId: currentUser._id,
         }),
       });
+  
       const data = await res.json();
       if (res.ok) {
         setComment('');
         setCommentError(null);
         setComments([data, ...comments]);
+      } else {
+        console.error("Error submitting comment", data);
       }
     } catch (error) {
       setCommentError(error.message);
     }
   };
-
+  
+  
   const handleLike = async (commentId) => {
     if (!currentUser) {
       navigate('/sign-in');
       return;
     }
     try {
-      const res = await fetch(`/api/comment/likeComment/${commentId}`, {
+      const res = await fetch(`http://localhost:3000/api/comment/likeComment/${commentId}`, {
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${currentUser.token}`, // Include the token for authorization
+          'Authorization': `Bearer ${currentUser.token}`,
           'Content-Type': 'application/json',
-        },
+        }
+        ,
       });
       if (res.ok) {
         const data = await res.json();
@@ -106,11 +119,13 @@ export default function CommentSection({ postId }) {
       return;
     }
     try {
-      const res = await fetch(`/api/comment/deleteComment/${commentToDelete}`, {
+      const res = await fetch(`http://localhost:3000/api/comment/deleteComment/${commentToDelete}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${currentUser.token}`, // Include the token for authorization
-        },
+          'Authorization': `Bearer ${currentUser.token}`,
+          'Content-Type': 'application/json',
+        }
+        ,
       });
       if (res.ok) {
         setComments(comments.filter((comment) => comment._id !== commentToDelete));

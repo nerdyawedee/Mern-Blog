@@ -12,7 +12,13 @@ export default function Comment({ comment, onLike, onEdit, onDelete }) {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const res = await fetch(`/api/user/${comment.userId}`);
+        const res = await fetch(`http://localhost:3000/api/user/${comment.userId}`,{
+          method:'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${currentUser.token}`,
+            }
+        });
         const data = await res.json();
         if (res.ok) {
           setUser(data);
@@ -30,18 +36,13 @@ export default function Comment({ comment, onLike, onEdit, onDelete }) {
   };
 
   const handleSave = async () => {
-    if (!currentUser) {
-      console.error('User not authenticated');
-      return;
-    }
-  
     try {
-      const token = currentUser.token; // Use currentUser from the Redux state for the token
-      const res = await fetch(`/api/comment/editComment/${comment._id}`, {
+      const token = localStorage.getItem('access-token');
+      const res = await fetch(`http://localhost:3000/api/comment/editComment/${comment._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Correctly format the Authorization header
+          'Authorization': `Bearer ${currentUser.token}`,
         },
         body: JSON.stringify({
           content: editedContent,
@@ -49,16 +50,12 @@ export default function Comment({ comment, onLike, onEdit, onDelete }) {
       });
       if (res.ok) {
         setIsEditing(false);
-        onEdit(comment._id, editedContent); // Fix argument passed to onEdit
-      } else {
-        const errorData = await res.json();
-        console.error('Error:', errorData.message);
+        onEdit(comment, editedContent);
       }
     } catch (error) {
       console.log(error.message);
     }
   };
-  
   return (
     <div className='flex p-4 border-b dark:border-gray-600 text-sm'>
       <div className='flex-shrink-0 mr-3'>

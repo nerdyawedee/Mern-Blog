@@ -1,4 +1,5 @@
 import Comment from "../Models/commentModel.js";
+import { errorHandler } from "../Utis/error.js";
 
 export const createComment = async (req, res, next) => {
   try {
@@ -99,6 +100,7 @@ export const deleteComment = async (req, res, next) => {
 };
 
 export const getcomments = async (req, res, next) => {
+  console.log('User object:', req.user);
   if (!req.user.isAdmin)
     return next(errorHandler(403, "You are not allowed to get all comments"));
   try {

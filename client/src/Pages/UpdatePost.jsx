@@ -85,7 +85,7 @@ export default function UpdatePost() {
     e.preventDefault();
     try {
       const token = localStorage.getItem('access_token');
-      const res = await fetch(`/api/post/updatepost/${formData._id}/${currentUser._id}`, {
+      const res = await fetch(`http://localhost:3000/api/post/updatepost/${formData._id}/${currentUser._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -102,7 +102,7 @@ export default function UpdatePost() {
       }
 
       setPublishError(null);
-      navigate("/dashboard?tab=posts");
+      navigate(`/post/${data.slug}`);
     } catch (error) {
       setPublishError('Something went wrong');
       console.error(error);

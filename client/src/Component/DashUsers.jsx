@@ -10,20 +10,18 @@ export default function DashUsers() {
   const [showMore, setShowMore] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [userIdToDelete, setUserIdToDelete] = useState('');
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const token = localStorage.getItem('access_token')
-        if (!token) {
-          console.error('No authentication token found');
-          return;
-        }
-        const res = await fetch(`/api/user/getusers`, {
+        const token = localStorage.getItem('access-token');
+        // console.log(token);
+        const res = await fetch(`http://localhost:3000/api/user/getusers`, {
           method: 'GET',
-          headers: {  // Corrected key name from 'header' to 'headers'
+          headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          }
+            'Authorization': `Bearer ${currentUser.token}`,
+          },
         });
         const data = await res.json();
         if (res.ok) {
@@ -31,36 +29,27 @@ export default function DashUsers() {
           if (data.users.length < 9) {
             setShowMore(false);
           }
-        } else {
-          console.error('Failed to fetch users:', data.message); // Handle non-200 status codes
         }
       } catch (error) {
-        console.error('Error fetching users:', error.message);
+        console.log(error.message);
       }
     };
-
     if (currentUser.isAdmin) {
       fetchUsers();
     }
   }, [currentUser._id]);
 
-
   const handleShowMore = async () => {
     const startIndex = users.length;
-    console.log(startIndex);
     try {
-      const token = localStorage.getItem('access_token')
-      if (!token) {
-        console.error('No authentication token found');
-        return;
-      }
-      const res = await fetch(`/api/user/getusers?startIndex=${startIndex}`, {
-        method: 'GET',
-        headers: {  // Corrected key name from 'header' to 'headers'
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        }
-      })
+      const token = localStorage.getItem('access-token');
+      const res = await fetch(`http://localhost:3000/api/user/getusers?startIndex=${startIndex}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+'Authorization': `Bearer ${currentUser.token}`,          }
+        });
       const data = await res.json();
       if (res.ok) {
         setUsers((prev) => [...prev, ...data.users]);
@@ -75,17 +64,12 @@ export default function DashUsers() {
 
   const handleDeleteUser = async () => {
     try {
-      const token = localStorage.getItem('access_token')
-      if (!token) {
-        console.error('No authentication token found');
-        return;
-      }
-      const res = await fetch(`/api/user/delete/${userIdToDelete}`, {
+      const token = localStorage.getItem('access-token');
+      const res = await fetch(`http://localhost:3000/api/user/delete/${userIdToDelete}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        }
+'Authorization': `Bearer ${currentUser.token}`,        }
       });
       const data = await res.json();
       if (res.ok) {
@@ -100,7 +84,7 @@ export default function DashUsers() {
   };
 
   return (
-    <div className='table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500 dark:text-white'>
+    <div className='table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500'>
       {currentUser.isAdmin && users.length > 0 ? (
         <>
           <Table hoverable className='shadow-md'>

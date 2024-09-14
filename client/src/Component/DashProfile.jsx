@@ -7,7 +7,7 @@ import {
   ref,
   uploadBytesResumable,
 } from 'firebase/storage';
-import { app } from '../Firebase.js';
+import { app } from '../Firebase';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import {
@@ -101,60 +101,52 @@ export default function DashProfile() {
     e.preventDefault();
     setUpdateUserError(null);
     setUpdateUserSuccess(null);
-
+  
     if (Object.keys(formData).length === 0) {
       setUpdateUserError('No changes made');
       return;
     }
-
+  
     if (imageFileUploading) {
       setUpdateUserError('Please wait for image to upload');
       return;
     }
-    console.log(formData)
+  
     try {
       dispatch(updateStart());
-      const token = localStorage.getItem('access_token')
-      if (!token) {
-        console.error('No authentication token found');
-        return;
-      }
-      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+      const token = localStorage.getItem('access_token');
+      const res = await fetch(`http://localhost:3000/api/user/update/${currentUser._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${currentUser.token}`,
         },
-        body: JSON.stringify(
-         { formData
-          }
-        ),
+        body: JSON.stringify(formData),
       });
-
-      if (!res.ok) {
-        throw new Error(`Failed to update user: ${res.statusText}`);
-      }
-
       const data = await res.json();
-      dispatch(updateSuccess(data));
-      setUpdateUserSuccess("User's profile updated successfully");
+      if (!res.ok) {
+        dispatch(updateFailure(data.message));
+        setUpdateUserError(data.message);
+      } else {
+        dispatch(updateSuccess(data));
+        setUpdateUserSuccess("User's profile updated successfully");
+      }
     } catch (error) {
-      console.error('Error updating user:', error.message);
-      dispatch(updateFailure(error.message || 'Failed to update user'));
-      setUpdateUserError('Failed to update user. Please try again later.');
+      dispatch(updateFailure(error.message));
+      setUpdateUserError(error.message);
     }
   };
-
+  
   const handleDeleteUser = async () => {
     setShowModal(false);
     try {
       const token = localStorage.getItem('access_token');
       dispatch(deleteUserStart());
-      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+      const res = await fetch(`http://localhost:3000/api/user/delete/${currentUser._id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${currentUser.token}`,
         },
       });
       const data = await res.json();
@@ -170,7 +162,7 @@ export default function DashProfile() {
 
   const handleSignout = async () => {
     try {
-      const res = await fetch('/api/user/signout', {
+      const res = await fetch('http://localhost:3000/api/user/signout', {
         method: 'POST',
       });
       const data = await res.json();
@@ -212,8 +204,9 @@ export default function DashProfile() {
                   left: 0,
                 },
                 path: {
-                  stroke: `rgba(62, 152, 199, ${imageFileUploadProgress / 100
-                    })`,
+                  stroke: `rgba(62, 152, 199, ${
+                    imageFileUploadProgress / 100
+                  })`,
                 },
               }}
             />
@@ -221,10 +214,11 @@ export default function DashProfile() {
           <img
             src={imageFileUrl || currentUser.profilePicture}
             alt='user'
-            className={`rounded-full w-full h-full object-cover border-8 border-[lightgray] ${imageFileUploadProgress &&
+            className={`rounded-full w-full h-full object-cover border-8 border-[lightgray] ${
+              imageFileUploadProgress &&
               imageFileUploadProgress < 100 &&
               'opacity-60'
-              }`}
+            }`}
           />
         </div>
         {imageFileUploadError && (
@@ -293,8 +287,12 @@ export default function DashProfile() {
           {error}
         </Alert>
       )}
-      <Modal show={showModal} onClose={() => setShowModal(false)} popup
-        size='md' className='bg-opacity-65 min-h-s'>
+      <Modal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        popup
+        size='md'
+      >
         <Modal.Header />
         <Modal.Body>
           <div className='text-center'>

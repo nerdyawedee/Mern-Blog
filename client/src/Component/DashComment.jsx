@@ -10,89 +10,102 @@ export default function DashComments() {
   const [showMore, setShowMore] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [commentIdToDelete, setCommentIdToDelete] = useState('');
+  
+  // Fetch comments when the component mounts
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const token = localStorage.getItem('access_token')
-        if (!token) {
-            console.error('No authentication token found');
-            return;
-        }
-        const res = await fetch(`/api/comment/getcomments`,{
-          method:'GET',
-          headers:{
-            'Content-Type':'application/json',
-            'Authorization': `Bearer ${token}`,
-          }
+        // const token = localStorage.getItem('access-token');
+        const res = await fetch(`http://localhost:3000/api/comment/getcomments`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentUser.token}`,
+          },
         });
+        
         const data = await res.json();
+        console.log('Fetched comments:', JSON.stringify(data, null, 2));  // Debugging: Print the fetched data
+        
         if (res.ok) {
           setComments(data.comments);
           if (data.comments.length < 9) {
             setShowMore(false);
           }
+        } else {
+          console.error('Error fetching comments:', data.message);
         }
       } catch (error) {
-        console.log(error.message);
+        console.error('Error:', error.message);
       }
     };
-    if (currentUser.isAdmin) {
+
+    if (currentUser?.isAdmin) {
       fetchComments();
     }
-  }, [currentUser._id]);
+  }, [currentUser]);
 
+  // Load more comments
   const handleShowMore = async () => {
     const startIndex = comments.length;
     try {
-      const res = await fetch(
-        `/api/comment/getcomments?startIndex=${startIndex}`
+      const res = await fetch(`http://localhost:3000/api/comment/getcomments?startIndex=${startIndex}`,
+        
+          {
+            method:'GET',
+            headers: {
+              'Authorization': `Bearer ${currentUser.token}`,
+              'Content-Type': 'application/json',
+            }
+          }
+        
       );
       const data = await res.json();
+      console.log('Fetched more comments:', JSON.stringify(data, null, 2));  // Debugging: Print the fetched data
+
       if (res.ok) {
         setComments((prev) => [...prev, ...data.comments]);
         if (data.comments.length < 9) {
           setShowMore(false);
         }
+      } else {
+        console.error('Error fetching more comments:', data.message);
       }
     } catch (error) {
-      console.log(error.message);
+      console.error('Error:', error.message);
     }
   };
 
+  // Delete a comment
   const handleDeleteComment = async () => {
     setShowModal(false);
     try {
-        const token = localStorage.getItem('access_token')
-      if (!token) {
-        console.error('No authentication token found');
-        return;
-      }
-      const res = await fetch(
-        `/api/comment/deleteComment/${commentIdToDelete}`,
-        {
-          method: 'DELETE',
-          headers:{
-            'Content-Type':'application/json'
-          }
+      const res = await fetch(`http://localhost:3000/api/comment/deleteComment/${commentIdToDelete}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`,
+          'Content-Type': 'application/json',
         }
-      );
+      });
       const data = await res.json();
+      console.log('Delete response:', JSON.stringify(data, null, 2));  // Debugging: Print the delete response
+
       if (res.ok) {
         setComments((prev) =>
           prev.filter((comment) => comment._id !== commentIdToDelete)
         );
         setShowModal(false);
       } else {
-        console.log(data.message);
+        console.error('Error deleting comment:', data.message);
       }
     } catch (error) {
-      console.log(error.message);
+      console.error('Error:', error.message);
     }
   };
 
   return (
     <div className='table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500'>
-      {currentUser.isAdmin && comments.length > 0 ? (
+      {currentUser?.isAdmin && comments.length > 0 ? (
         <>
           <Table hoverable className='shadow-md'>
             <Table.Head>

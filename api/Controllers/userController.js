@@ -1,6 +1,7 @@
 import bcryptjs from "bcryptjs";
 import { errorHandler } from "../Utis/error.js";
-import User from "../models/userModel.js";
+import User from "../Models/userModel.js";
+
 export const test = (req, res) => {
   res.json({ message: "API is working!" });
 };

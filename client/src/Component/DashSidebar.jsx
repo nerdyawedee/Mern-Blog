@@ -32,12 +32,8 @@ export default function DashSidebar() {
         console.log("Token not present");
         return;
       }
-      const res = await fetch('/api/user/signout', {
+      const res = await fetch('http://localhost:3000/api/user/signout', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
       });
       const data = await res.json();
       if (!res.ok) {
