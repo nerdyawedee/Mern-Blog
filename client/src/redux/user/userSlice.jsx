@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  currentUser: null,
+  currentUser: JSON.parse(localStorage.getItem('user')) || null,
   error: null,
   loading: false,
 };
@@ -18,6 +18,7 @@ const userSlice = createSlice({
       state.currentUser = action.payload;
       state.loading = false;
       state.error = null;
+      localStorage.setItem('user', JSON.stringify(action.payload)); // Store user in localStorage
     },
     signInFailure: (state, action) => {
       state.loading = false;
@@ -31,6 +32,8 @@ const userSlice = createSlice({
       state.currentUser = action.payload;
       state.loading = false;
       state.error = null;
+      // Update the user and token in localStorage
+      localStorage.setItem('user', JSON.stringify(action.payload));
     },
     updateFailure: (state, action) => {
       state.loading = false;
@@ -44,6 +47,7 @@ const userSlice = createSlice({
       state.currentUser = null;
       state.loading = false;
       state.error = null;
+      localStorage.removeItem('user'); // Remove user from localStorage
     },
     deleteUserFailure: (state, action) => {
       state.loading = false;
@@ -53,6 +57,7 @@ const userSlice = createSlice({
       state.currentUser = null;
       state.error = null;
       state.loading = false;
+      localStorage.removeItem('user'); // Remove user from localStorage on signout
     },
   },
 });

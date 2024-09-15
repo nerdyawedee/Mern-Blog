@@ -37,7 +37,6 @@ export default function CommentSection({ postId }) {
   
     if (!currentUser || !currentUser.token) {
       console.error("No valid token found");
-      // navigate('/sign-in');
       return;
     }
   
@@ -50,8 +49,8 @@ export default function CommentSection({ postId }) {
       const res = await fetch(`http://localhost:3000/api/comment/create`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${currentUser.token}`,  // Include token in the header
-          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${currentUser.token}`, // Add token to headers
+          'Content-Type': 'application/json', // Add content type
         },
         body: JSON.stringify({
           content: comment,
@@ -72,6 +71,7 @@ export default function CommentSection({ postId }) {
       setCommentError(error.message);
     }
   };
+  
   
   
   const handleLike = async (commentId) => {
@@ -139,7 +139,7 @@ export default function CommentSection({ postId }) {
   };
 
   return (
-    <div className='max-w-2xl mx-auto w-full p-3'>
+    <div className='max-w-2xl dark:text-white mx-auto w-full p-3'>
       {currentUser ? (
         <div className='flex items-center gap-1 my-5 text-gray-500 text-sm'>
           <p>Signed in as:</p>

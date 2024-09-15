@@ -18,7 +18,7 @@ function Dashboard() {
     }
   }, [location.search]);
   return (
-    <div className='min-h-screen flex flex-col md:flex-row dark:text-white'>
+    <div className='min-h-screen flex flex-col dark:text-white md:flex-row dark:text-white'>
       <div className='md:w-56'>
         {/* Sidebar */}
         <DashSidebar />

@@ -43,7 +43,7 @@ export default function SignIn() {
   };
 
   return (
-    <div className="min-h-screen mt-20">
+    <div className="min-h-screen dark:text-white mt-20">
       <div className="flex p-3 max-w-3xl mx-auto flex-col md:flex-row md:items-center gap-5">
         {/* Left */}
         <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left">
@@ -55,7 +55,7 @@ export default function SignIn() {
               style={{ maxHeight: '200px', maxWidth: '100%' }} // Adjust the height and width as needed
             />
           </Link>
-          <p className="text-sm mt-5 text-gray-700 dark:text-gray-500">
+          <p className="text-sm mt-5 text-gray-700  dark:text-white">
             You can sign up with your email and password<br />
             or with Google.
           </p>
@@ -64,7 +64,7 @@ export default function SignIn() {
         <div className="flex-1">
           <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label htmlFor="email" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-500">
+              <label htmlFor="email" className="block text-sm font-medium mb-1 text-gray-700 dark:text-white">
                 Your email
               </label>
               <input
@@ -76,7 +76,7 @@ export default function SignIn() {
               />
             </div>
             <div className="mb-3">
-              <label htmlFor="password" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-500">
+              <label htmlFor="password" className="block text-sm font-medium mb-1 text-gray-700 dark:text-white">
                 Your password
               </label>
               <input

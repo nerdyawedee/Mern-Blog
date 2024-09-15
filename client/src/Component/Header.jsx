@@ -50,7 +50,7 @@ export default function Header() {
   };
 
   return (
-    <Navbar className='border-b-2 flex items-center justify-between px-4'>
+    <Navbar className='border-b-2 flex items-center justify-between dark:text-white px-4'>
       {/* Logo */}
       <Link
         to='/'
