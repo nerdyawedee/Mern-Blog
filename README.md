@@ -110,12 +110,5 @@ A fully-featured blog website that allows users to create, read, update, and del
 
 This project is licensed under the MIT License. See the `LICENSE` file for details.
 
-## Contact
-
-For any queries, feel free to contact:
-- **Email**: your-email@example.com
-- **LinkedIn**: [Your Name](https://linkedin.com/in/your-profile)
-
----
 
 Happy coding!
